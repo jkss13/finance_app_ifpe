@@ -1,7 +1,7 @@
 import yfinance as yf
 import pandas as pd
 import streamlit as st
-import plotly as plt
+# import plotly as plt
 
 # https://github.com/ranaroussi/yfinance
 # https://docs.streamlit.io/library/api-reference
@@ -16,11 +16,11 @@ st.sidebar.image('patinhas.png', use_column_width=True)
 
 st.metric(label="Selected action:", value=selected_ticker)
 
-# st.header("News")
-# ticker_news = yf.Ticker(selected_ticker).news
-# news = pd.DataFrame.from_records(ticker_news)
-# news = news.drop(['uuid', 'providerPublishTime', 'thumbnail'], axis=1)
-# st.dataframe(news, use_container_width=True)
+st.header("News")
+ticker_news = yf.Ticker(selected_ticker).news
+news = pd.DataFrame.from_records(ticker_news)
+news = news.drop(['uuid', 'providerPublishTime', 'thumbnail'], axis=1)
+st.dataframe(news, use_container_width=True)
 
 st.header("History")
 ticker_history = yf.Ticker(selected_ticker).history(period='1mo')
