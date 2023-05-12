@@ -2,4 +2,4 @@ yfinance
 pandas
 plotly
 streamlit
-flake8_docstrings
+mpl_finance
