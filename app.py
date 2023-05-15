@@ -2,48 +2,60 @@
 # https://docs.streamlit.io/library/api-reference
 # https://chat.openai.com/
 
-# st.sidebar.title("Finance App")
-
-# tickers_list = ['AAPL', 'GOOG', 'TSLA', 'AMZN', 'MSFT']
-# selected_ticker = st.sidebar.selectbox('Selecione uma ação', tickers_list)
-
-# st.sidebar.image('patinhas.png', use_column_width=True)
-
-# st.metric(label="Selected action:", value=selected_ticker)
-
-# st.header("News")
-# ticker_news = yf.Ticker(selected_ticker).news
-# news = pd.DataFrame.from_records(ticker_news)
-# news = news.drop(['uuid', 'providerPublishTime', 'thumbnail'], axis=1)
-# st.dataframe(news, use_container_width=True)
-
-# st.header("History")
-# ticker_history = yf.Ticker(selected_ticker).history(period='1mo')
-# st.dataframe(ticker_history, use_container_width=True)
-
-# st.header("Actions")
-# ticker_actions = yf.Ticker(selected_ticker).actions
-# st.dataframe(ticker_actions, use_container_width=True)
-
-# st.header("Splits")
-# ticker_splits = yf.Ticker(selected_ticker).splits
-# st.dataframe(ticker_splits, use_container_width=True)
-
-# st.header("Dividends")
-# ticker_dividends = yf.Ticker(selected_ticker).dividends
-# st.dataframe(ticker_dividends, use_container_width=True)
-
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 import yfinance as yf
 
-data = yf.Ticker("GOOG").history(period='1mo')
-data = pd.DataFrame(data)
+st.sidebar.title("Finance App")
 
-fig = go.Figure(data=[go.Candlestick(x=data['Date'],
-                open=data['Open'],
-                high=data['High'],
-                low=data['Low'],
-                close=data['Close'])])
-st.plotly_chart(fig, use_container_width=True)
+tickers_list = ['AAPL', 'GOOG', 'TSLA', 'AMZN', 'MSFT']
+selected_ticker = st.sidebar.selectbox('Selecione uma ação', tickers_list)
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.image('patinhas.png', use_column_width=True)
+
+st.metric(label="Selected action:", value=selected_ticker)
+
+with st.expander("History"):
+    st.subheader("Data")
+
+    history_data = yf.Ticker(selected_ticker).history(period='1mo')
+    history_data = history_data.reset_index()  # Resetando o índice para obter a coluna de datas
+    st.dataframe(history_data, use_container_width=True)
+
+    fig = go.Figure(data=[go.Candlestick(x=history_data['Date'],
+                    open=history_data['Open'],
+                    high=history_data['High'],
+                    low=history_data['Low'],
+                    close=history_data['Close'])])
+    st.subheader("Candlesticks Chart")
+    st.plotly_chart(fig, use_container_width=True)
+
+with st.expander("Actions"):
+    st.subheader("Data")
+    actions_data = yf.Ticker(selected_ticker).actions
+    actions_data = actions_data.reset_index()  
+    st.dataframe(actions_data, use_container_width=True)
+
+with st.expander("Dividends"):
+    st.subheader("Data")
+    dividends_data = yf.Ticker(selected_ticker).dividends
+    dividends_data = dividends_data.reset_index()  
+    st.dataframe(dividends_data, use_container_width=True)
+
+with st.expander("Splits"):
+    st.subheader("Data")
+    splits_data = yf.Ticker(selected_ticker).splits
+    splits_data = splits_data.reset_index() 
+    st.dataframe(splits_data, use_container_width=True)
+
+with st.expander("News"):
+    st.subheader("Data")
+    news_data = yf.Ticker(selected_ticker).news
+    news_data = pd.DataFrame.from_records(news_data)
+    news_data = news_data.drop(['uuid', 'providerPublishTime', 'thumbnail'], axis=1)
+    st.dataframe(news_data, use_container_width=True)
