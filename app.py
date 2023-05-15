@@ -6,6 +6,8 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 import yfinance as yf
+import datetime
+import plotly.express as px
 
 st.sidebar.title("Finance App")
 
@@ -40,18 +42,46 @@ with st.expander("Actions"):
     actions_data = yf.Ticker(selected_ticker).actions
     actions_data = actions_data.reset_index()  
     st.dataframe(actions_data, use_container_width=True)
+    st.subheader("Chart")
+    # dividends_data["Year"] = dividends_data["Date"].year
+    fig = px.line(actions_data, x='Date', y='Dividends')
+    fig.update_layout(
+        title='Oscilação de Dividendos',
+        xaxis_title='Ano',
+        yaxis_title='Dividendos',
+        template='plotly_white'
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
 with st.expander("Dividends"):
     st.subheader("Data")
     dividends_data = yf.Ticker(selected_ticker).dividends
     dividends_data = dividends_data.reset_index()  
     st.dataframe(dividends_data, use_container_width=True)
+    st.subheader("Chart")
+    # dividends_data["Year"] = dividends_data["Date"].year
+    fig = px.line(dividends_data, x='Date', y='Dividends')
+    fig.update_layout(
+        title='Oscilação de Dividendos',
+        xaxis_title='Ano',
+        yaxis_title='Dividendos',
+        template='plotly_white'
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
 with st.expander("Splits"):
     st.subheader("Data")
     splits_data = yf.Ticker(selected_ticker).splits
     splits_data = splits_data.reset_index() 
     st.dataframe(splits_data, use_container_width=True)
+    st.subheader("Stock Splits Number by Year")
+    data_grouped = splits_data.groupby(splits_data['Date'].dt.year)['Stock Splits'].sum().reset_index()
+    data_grouped.columns = ['Ano', 'Quantidade']
+    fig = px.bar(data_grouped, x='Ano', y='Quantidade', labels={'Quantidade': 'Quantidade de Stock Splits'}, 
+             title='Quantidade de Stock Splits por Ano')
+    # Configurar o layout do gráfico
+    fig.update_layout(xaxis={'type': 'category'})
+    st.plotly_chart(fig, use_container_width=True)
 
 with st.expander("News"):
     st.subheader("Data")
@@ -59,3 +89,17 @@ with st.expander("News"):
     news_data = pd.DataFrame.from_records(news_data)
     news_data = news_data.drop(['uuid', 'providerPublishTime', 'thumbnail'], axis=1)
     st.dataframe(news_data, use_container_width=True)
+    st.subheader("News by Tickers")
+    counts = news_data.explode("relatedTickers").groupby(["relatedTickers", "title"]).size().unstack(fill_value=0)
+    counts = counts.reset_index().melt(id_vars="relatedTickers", var_name="title", value_name="count")
+    fig = px.bar(counts, x="relatedTickers", y="count", barmode="stack",
+             labels={"relatedTickers": "Related Tickers", "count": "Quantidade de Itens"})
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.subheader("News by Publisher (%)")
+    df_grouped = news_data.groupby('publisher')['title'].count().reset_index()
+    df_grouped['percentage'] = (df_grouped['title'] / df_grouped['title'].sum()) * 100
+    fig = px.pie(df_grouped, values='title', names='publisher', 
+                labels={'title': 'Amount', 'publisher': 'Publisher'}, 
+                title='Percentage of items per Publisher')
+    st.plotly_chart(fig, use_container_width=True)
