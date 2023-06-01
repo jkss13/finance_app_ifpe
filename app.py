@@ -2,8 +2,6 @@
 # https://docs.streamlit.io/library/api-reference
 # https://chat.openai.com/
 # https://www.alphavantage.co/
-# https://iexcloud.io/
-# https://polygon.io/
 
 import streamlit as st
 import plotly.graph_objects as go
@@ -19,7 +17,12 @@ tab1, tab2, tab3 = st.tabs(["Menu", "Segment Details", "Ticker Details"])
 with tab1:
     segments = ["Technology"]
     segment = st.selectbox('Selecione um segmento', segments)
-    st.write(segments)
+    # api_key = "JS0BP2SS4ZTC1RDW"
+    # url = f"https://www.alphavantage.co/scan?function=LIST_ALL_TAGS&apikey={api_key}"
+    # response = requests.get(url)
+    # data = response.json()
+    # topics = data["tags"]
+    # st.write(topics)
 with tab2:
     st.metric(label="Segment:", value=segment)
     url = f"https://finance.yahoo.com/sector/{segment.lower().replace(' ', '-')}"
